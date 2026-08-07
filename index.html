@@ -1,0 +1,100 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <title>School Store</title>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background-color: #f3f5f7;
+      margin: 0;
+      padding: 30px;
+      text-align: center;
+      color: #222;
+    }
+
+    h1 {
+      font-size: 42px;
+      margin-bottom: 10px;
+    }
+
+    .subtitle {
+      font-size: 22px;
+      margin-bottom: 40px;
+    }
+
+    .menu {
+      display: grid;
+      grid-template-columns: repeat(2, 1fr);
+      gap: 20px;
+      max-width: 700px;
+      margin: auto;
+    }
+
+    .menu-button {
+      background: white;
+      border: 4px solid #333;
+      border-radius: 20px;
+      padding: 35px 15px;
+      font-size: 28px;
+      font-weight: bold;
+      cursor: pointer;
+      min-height: 130px;
+    }
+
+    .menu-button:hover {
+      background: #e8f4ff;
+      transform: scale(1.02);
+    }
+
+    .icon {
+      display: block;
+      font-size: 50px;
+      margin-bottom: 10px;
+    }
+
+    @media (max-width: 600px) {
+      .menu {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+
+<body>
+
+  <h1>🏪 School Store</h1>
+
+  <div class="subtitle">
+    What job are you doing today?
+  </div>
+
+  <div class="menu">
+
+    <button class="menu-button">
+      <span class="icon">🛒</span>
+      CHECKOUT
+    </button>
+
+    <button class="menu-button">
+      <span class="icon">📦</span>
+      STOCK
+    </button>
+
+    <button class="menu-button">
+      <span class="icon">💰</span>
+      COUNT MONEY
+    </button>
+
+    <button class="menu-button">
+      <span class="icon">💬</span>
+      HELP A CUSTOMER
+    </button>
+
+  </div>
+
+</body>
+</html>
