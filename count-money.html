@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Count Money</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #9f0f0f;
+      --surface: #ffffff;
+      --surface-muted: #faf7f5;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1c1c1c;
+      --text-muted: #575757;
+      --accent: #a80000;
+      --shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(168, 0, 0, 0.65);
+      outline-offset: 3px;
+    }
+
+    body {
+      margin: 0;
+      min-height: 100vh;
+      font-family: var(--font-family, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      background: linear-gradient(180deg, #9f0f0f 0%, #7a0707 45%, #500202 100%);
+      color: var(--text);
+      padding: 32px;
+      box-sizing: border-box;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 32px;
+      border-radius: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      flex-wrap: wrap;
+      gap: 16px;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 44px;
+      color: var(--text);
+      line-height: 1.08;
+    }
+
+    .header button {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .panel {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 24px;
+      padding: 28px;
+      margin-bottom: 24px;
+      color: var(--text);
+    }
+
+    .panel h2 {
+      margin-top: 0;
+      font-size: 28px;
+      color: var(--text);
+    }
+
+    .panel p {
+      margin: 0;
+      font-size: 18px;
+      line-height: 1.7;
+      color: var(--text-muted);
+    }
+
+    .money-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 18px;
+    }
+
+    .money-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 22px;
+      padding: 20px;
+      display: grid;
+      gap: 14px;
+      min-height: 220px;
+      color: var(--text);
+    }
+
+    .money-card .icon {
+      font-size: 44px;
+      display: inline-block;
+    }
+
+    .money-card .icon img {
+      width: 200px;
+      height: auto;
+      max-height: 96px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      vertical-align: middle;
+      background: #fff;
+      padding: 4px;
+    }
+
+    .money-card .name {
+      font-size: 24px;
+      margin: 0;
+    }
+
+    .money-card .denom-value {
+      color: #8b0000;
+      font-weight: 700;
+    }
+
+    .money-card .control-row {
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      flex-wrap: wrap;
+    }
+
+    .money-card button,
+    .reset-button {
+      background: #ffffff;
+      color: #8b0000;
+      border: 1px solid rgba(168,0,0,0.14);
+      border-radius: 16px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+    }
+
+    .money-card button:hover,
+    .reset-button:hover {
+      transform: scale(1.02);
+      opacity: 0.95;
+    }
+
+    .money-card input {
+      width: 70px;
+      padding: 10px 12px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .summary {
+      background: var(--surface);
+      color: var(--text);
+      border-radius: 24px;
+      padding: 28px;
+      display: grid;
+      gap: 16px;
+      align-items: center;
+      text-align: center;
+    }
+
+    .summary h2 {
+      margin: 0;
+      color: #111;
+    }
+
+    .summary .total-label {
+      font-size: 20px;
+      color: #666;
+    }
+
+    .summary .total-value {
+      font-size: 48px;
+      font-weight: bold;
+      margin: 0;
+      color: #8b0000;
+    }
+
+    .summary .description {
+      margin: 0;
+      color: #333;
+      font-size: 16px;
+      line-height: 1.5;
+    }
+
+    .hint {
+      background: var(--surface-muted);
+      color: var(--text);
+      border-radius: 18px;
+      padding: 18px;
+      font-size: 16px;
+    }
+
+    @media (max-width: 700px) {
+      .header {
+        justify-content: center;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button onclick="location.href='index.html'">← Back to Home</button>
+      <h1>Count Money</h1>
+      <button onclick="location.href='checkout.html'">Checkout</button>
+    </div>
+
+    <div class="panel">
+      <h2>Count the money box</h2>
+      <p>Enter how many of each bill and coin are in the money box. The total will calculate automatically so you can see how much cash is ready.</p>
+    </div>
+
+    <div class="money-grid" id="money-grid"></div>
+
+    <div class="summary">
+      <div>
+        <div class="total-label">Money box total</div>
+        <p class="total-value" id="money-total">$0.00</p>
+      </div>
+      <p class="description">Update the counts to match the actual bills and coins. The total gives you a quick check for the cash drawer.</p>
+      <button class="reset-button" id="reset-counts">Reset counts</button>
+    </div>
+  </div>
+
+  <script>
+    const moneyGrid = document.getElementById('money-grid');
+    const moneyTotal = document.getElementById('money-total');
+    const resetButton = document.getElementById('reset-counts');
+
+    const denominations = [
+      { name: '$100 Bill', icon: '💵', value: 100, image: 'assets/bills/bill-100.jpg' },
+      { name: '$50 Bill', icon: '💵', value: 50, image: 'assets/bills/bill-50.jpg' },
+      { name: '$20 Bill', icon: '💵', value: 20, image: 'assets/bills/bill-20.jpg' },
+      { name: '$10 Bill', icon: '🔟', value: 10, image: 'assets/bills/bill-10.jpg' },
+      { name: '$5 Bill', icon: '💵', value: 5, image: 'assets/bills/bill-5.jpg' },
+      { name: '$1 Bill', icon: '💵', value: 1, image: 'assets/bills/bill-1.jpg' },
+      { name: 'Quarter', icon: '🪙', value: 0.25, image: 'assets/bills/coin-quarter.jpg' },
+      { name: 'Dime', icon: '🪙', value: 0.10, image: 'assets/bills/coin-dime.png' },
+      { name: 'Nickel', icon: '🪙', value: 0.05, image: 'assets/bills/coin-nickel.jpg' },
+      { name: 'Penny', icon: '🪙', value: 0.01, image: 'assets/bills/coin-penny.png' },
+    ];
+
+    const moneyCounts = denominations.map(d => ({ ...d, count: 0 }));
+
+    function formatMoney(value) {
+      return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function buildMoneyGrid() {
+      moneyGrid.innerHTML = '';
+      moneyCounts.forEach((denom, index) => {
+        const card = document.createElement('div');
+        card.className = 'money-card';
+        card.innerHTML = `
+          <div class="icon">${denom.image ? `<img src="${denom.image}" alt="${denom.name} image" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<span class=\\\'icon\\\'>💵</span>')" />` : denom.icon}</div>
+          <div class="name">${denom.name}</div>
+          <div class="denom-value">$${formatMoney(denom.value)}</div>
+          <div class="control-row">
+            <button data-action="decrement" data-index="${index}">-</button>
+            <input type="number" min="0" value="${denom.count}" data-index="${index}" />
+            <button data-action="increment" data-index="${index}">+</button>
+          </div>
+        `;
+        moneyGrid.appendChild(card);
+      });
+
+      moneyGrid.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', handleCountButton);
+      });
+      moneyGrid.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('change', handleCountInput);
+      });
+    }
+
+    function handleCountButton(event) {
+      const action = event.currentTarget.dataset.action;
+      const index = Number(event.currentTarget.dataset.index);
+      const denom = moneyCounts[index];
+      if (!denom) return;
+      denom.count = Math.max(0, denom.count + (action === 'increment' ? 1 : -1));
+      updateMoneyGrid();
+    }
+
+    function handleCountInput(event) {
+      const index = Number(event.currentTarget.dataset.index);
+      const denom = moneyCounts[index];
+      if (!denom) return;
+      const value = Number(event.currentTarget.value);
+      denom.count = Number.isNaN(value) || value < 0 ? 0 : Math.floor(value);
+      updateMoneyGrid();
+    }
+
+    function getMoneyBoxTotal() {
+      return moneyCounts.reduce((total, denom) => total + denom.count * denom.value, 0);
+    }
+
+    function updateMoneyGrid() {
+      buildMoneyGrid();
+      moneyTotal.textContent = `$${formatMoney(getMoneyBoxTotal())}`;
+    }
+
+    resetButton.addEventListener('click', () => {
+      moneyCounts.forEach(denom => denom.count = 0);
+      updateMoneyGrid();
+    });
+
+    updateMoneyGrid();
+  </script>
+</body>
+</html>

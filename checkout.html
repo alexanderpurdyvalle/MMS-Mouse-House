@@ -1,0 +1,879 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Checkout</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #9f0f0f;
+      --bg-dark: #500202;
+      --surface: #ffffff;
+      --surface-muted: #faf7f5;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1c1c1c;
+      --text-muted: #575757;
+      --accent: #a80000;
+      --shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(168, 0, 0, 0.65);
+      outline-offset: 3px;
+    }
+
+    body {
+      font-family: var(--font-family, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      background: linear-gradient(180deg, #9f0f0f 0%, #7a0707 45%, #500202 100%);
+      color: var(--text);
+      margin: 0;
+      padding: 32px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 32px;
+      border-radius: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+    }
+
+    .header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 16px;
+      flex-wrap: wrap;
+      margin-bottom: 24px;
+    }
+
+    .header h1 {
+      margin: 0;
+      font-size: 44px;
+      color: var(--text);
+      line-height: 1.08;
+    }
+
+    .header button {
+      background: transparent;
+      border: none;
+      color: var(--accent);
+      text-decoration: none;
+      cursor: pointer;
+      font-size: 16px;
+      font-weight: 700;
+    }
+
+    .layout {
+      display: grid;
+      grid-template-columns: 2fr 1fr;
+      gap: 24px;
+    }
+
+    .panel {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      color: var(--text);
+    }
+
+    .product-grid {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .product-card,
+    .cart-card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      gap: 14px;
+      color: var(--text);
+    }
+
+    .product-card img,
+    .cart-card img {
+      width: 100%;
+      min-height: 160px;
+      object-fit: cover;
+      background: #2a0000;
+    }
+
+    .product-card button,
+    .cart-item button,
+    .checkout-button,
+    .denomination button,
+    .hint-button {
+      background: #ffffff;
+      color: #8b0000;
+      border: 1px solid rgba(168, 0, 0, 0.12);
+      border-radius: 16px;
+      padding: 12px 16px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+    }
+
+    .product-card button:hover,
+    .cart-item button:hover,
+    .checkout-button:hover,
+    .denomination button:hover,
+    .hint-button:hover {
+      transform: scale(1.02);
+      opacity: 0.95;
+    }
+
+    .product-card .content,
+    .cart-card .content {
+      padding: 18px;
+      display: grid;
+      gap: 12px;
+      color: var(--text);
+    }
+
+    .product-card .name,
+    .cart-item .name {
+      font-size: 20px;
+      margin: 0;
+      color: var(--text);
+    }
+
+    .product-card .price,
+    .cart-item .price,
+    .cart-total {
+      font-size: 18px;
+      margin: 0;
+      color: var(--text-muted);
+    }
+
+    .cart {
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+    }
+
+    .cart-item {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 14px;
+      display: grid;
+      gap: 10px;
+      color: var(--text);
+    }
+
+    .cart-item .row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quantity-controls {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      flex-wrap: wrap;
+    }
+
+    .quantity-controls input {
+      width: 70px;
+      padding: 10px 12px;
+      border-radius: 12px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      text-align: center;
+    }
+
+    .cart-footer {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 16px;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+    }
+
+    .cart-total-row {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      font-size: 22px;
+      font-weight: 700;
+    }
+
+    .checkout-button {
+      width: 100%;
+      font-size: 18px;
+      padding: 14px;
+    }
+
+    .overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0, 0, 0, 0.92);
+      display: none;
+      justify-content: center;
+      align-items: stretch;
+      padding: 20px;
+      z-index: 50;
+      overflow: hidden;
+    }
+
+    .overlay.active {
+      display: flex;
+    }
+
+    .dialog {
+      background: #ffffff;
+      color: #111;
+      width: min(100%, 1000px);
+      max-height: calc(100vh - 40px);
+      overflow-y: auto;
+      border-radius: 24px;
+      padding: 28px;
+      position: relative;
+      box-sizing: border-box;
+      margin: auto;
+    }
+
+    .dialog h2 {
+      margin-top: 0;
+    }
+
+    .dialog .close {
+      position: absolute;
+      top: 18px;
+      right: 18px;
+      border: none;
+      background: transparent;
+      color: #111;
+      font-size: 20px;
+      cursor: pointer;
+    }
+
+    .denominations-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 16px;
+      margin-top: 16px;
+    }
+
+    .denomination {
+      background: #ffffff;
+      border: 1px solid rgba(0,0,0,0.08);
+      border-radius: 20px;
+      color: #111;
+      padding: 18px;
+      display: grid;
+      gap: 14px;
+      min-height: 140px;
+    }
+
+    .denomination .bill-label {
+      display: flex;
+      align-items: center;
+      gap: 14px;
+      font-weight: bold;
+      font-size: 22px;
+    }
+
+    .denomination .bill-icon {
+      font-size: 40px;
+    }
+
+    .denomination .bill-image {
+      width: 200px;
+      height: auto;
+      max-height: 96px;
+      object-fit: contain;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: #fff;
+      padding: 4px;
+    }
+
+    .denomination .denom-value {
+      font-size: 18px;
+      font-weight: 700;
+      color: #333;
+      text-align: right;
+    }
+
+    .denomination .count-controls {
+      display: flex;
+      gap: 10px;
+      align-items: center;
+      justify-content: space-between;
+      flex-wrap: wrap;
+    }
+
+    .denomination input[type="number"] {
+      width: 90px;
+      padding: 12px 14px;
+      border-radius: 16px;
+      border: 1px solid #cccccc;
+      text-align: center;
+      font-size: 16px;
+    }
+
+    .denomination .count-controls button {
+      min-width: 44px;
+      min-height: 44px;
+      font-size: 20px;
+      padding: 10px;
+      border-radius: 14px;
+    }
+
+    .hint-container {
+      display: none;
+      margin-top: 16px;
+      background: var(--surface-muted);
+      color: var(--text);
+      border-radius: 16px;
+      padding: 20px;
+      font-size: 18px;
+      line-height: 1.6;
+    }
+
+    .hint-container.active {
+      display: block;
+    }
+
+    .hint-image {
+      width: 84px;
+      height: auto;
+      object-fit: contain;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+      background: #fff;
+      padding: 6px;
+    }
+
+    .hint-icon {
+      width: 84px;
+      height: 84px;
+      display: grid;
+      place-items: center;
+      font-size: 36px;
+      background: #fff;
+      border-radius: 8px;
+      border: 1px solid rgba(0,0,0,0.06);
+    }
+
+    .denomination .count-controls {
+      display: flex;
+      gap: 6px;
+    }
+
+    .denomination .count-controls button {
+      min-width: 40px;
+      padding: 8px 10px;
+    }
+
+    .money-summary {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+      margin-top: 20px;
+      font-size: 18px;
+    }
+
+    .money-summary .change {
+      color: #111;
+      background: #e8e8e8;
+      padding: 10px 14px;
+      border-radius: 14px;
+      flex: 1;
+    }
+
+    .money-summary .change.negative {
+      color: #c20000;
+      background: #ffe6e6;
+    }
+
+    .hint-container {
+      display: none;
+      margin-top: 16px;
+      background: #f8f8f8;
+      color: #111;
+      border-radius: 16px;
+      padding: 16px;
+      font-size: 16px;
+      line-height: 1.6;
+    }
+
+    .hint-container.active {
+      display: block;
+    }
+
+    .check-option {
+      margin: 18px 0 8px;
+      padding: 14px 16px;
+      background: var(--surface-muted);
+      border-radius: 16px;
+      color: var(--text);
+      font-size: 16px;
+    }
+
+    .check-option label {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      cursor: pointer;
+    }
+
+    .check-option input[type="checkbox"] {
+      width: 20px;
+      height: 20px;
+      accent-color: #8b0000;
+    }
+
+    .check-option .check-icon {
+      font-size: 24px;
+    }
+
+    @media (max-width: 980px) {
+      .layout {
+        grid-template-columns: 1fr;
+      }
+
+      .product-grid {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="header">
+      <button onclick="location.href='index.html'">← Back to Home</button>
+      <h1>Checkout</h1>
+      <button onclick="location.href='stock.html'">Stock</button>
+    </div>
+
+    <div class="layout">
+      <div class="panel">
+        <h2>Available Items</h2>
+        <div class="product-grid" id="product-grid"></div>
+      </div>
+
+      <div class="panel">
+        <h2>Cart</h2>
+        <div class="cart" id="cart"></div>
+        <div class="cart-footer">
+          <div class="cart-total-row">
+            <span>Total</span>
+            <span id="cart-total">$0.00</span>
+          </div>
+          <button class="checkout-button" id="complete-transaction" disabled>Complete Transaction</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="overlay" id="transaction-overlay">
+    <div class="dialog">
+      <button class="close" id="close-overlay" aria-label="Close transaction overlay" title="Close">✕</button>
+      <h2>Complete Transaction</h2>
+      <p>Total owed: <strong>$<span id="overlay-total">0.00</span></strong></p>
+      <div class="check-option">
+        <label>
+          <input type="checkbox" id="check-payment" />
+          <span class="check-icon">✅</span>
+          Accept check payment (covers the remaining balance)
+        </label>
+      </div>
+      <div id="denominations" class="denominations-grid"></div>
+
+      <div class="money-summary">
+        <div>Payment total: <strong>$<span id="payment-total">0.00</span></strong></div>
+        <div class="change" id="change-due">Change owed: $0.00</div>
+      </div>
+
+      <button class="hint-button" id="show-hint" style="display:none;">Hint</button>
+      <div class="hint-container" id="hint-container"></div>
+      <button class="checkout-button" id="finish-payment" disabled>Finish Transaction</button>
+    </div>
+  </div>
+
+  <script>
+    const storageKey = 'school-store-stock';
+    const productGrid = document.getElementById('product-grid');
+    const cartElement = document.getElementById('cart');
+    const cartTotalElement = document.getElementById('cart-total');
+    const completeButton = document.getElementById('complete-transaction');
+    const overlay = document.getElementById('transaction-overlay');
+    const closeOverlay = document.getElementById('close-overlay');
+    const overlayTotal = document.getElementById('overlay-total');
+    const denominationsContainer = document.getElementById('denominations');
+    const paymentTotalEl = document.getElementById('payment-total');
+    const changeDueEl = document.getElementById('change-due');
+    const showHintButton = document.getElementById('show-hint');
+    const hintContainer = document.getElementById('hint-container');
+    const checkPaymentCheckbox = document.getElementById('check-payment');
+    const finishPaymentButton = document.getElementById('finish-payment');
+
+    const denominations = [
+      { name: '$100', icon: '💵', value: 100, image: 'assets/bills/bill-100.jpg' },
+      { name: '$50', icon: '💵', value: 50, image: 'assets/bills/bill-50.jpg' },
+      { name: '$20', icon: '💵', value: 20, image: 'assets/bills/bill-20.jpg' },
+      { name: '$10', icon: '🔟', value: 10, image: 'assets/bills/bill-10.jpg' },
+      { name: '$5', icon: '💵', value: 5, image: 'assets/bills/bill-5.jpg' },
+      { name: '$1', icon: '💵', value: 1, image: 'assets/bills/bill-1.jpg' },
+      { name: '$0.25', icon: '🪙', value: 0.25, image: 'assets/bills/coin-quarter.jpg' },
+      { name: '$0.10', icon: '🪙', value: 0.10, image: 'assets/bills/coin-dime.png' },
+      { name: '$0.05', icon: '🪙', value: 0.05, image: 'assets/bills/coin-nickel.jpg' },
+      { name: '$0.01', icon: '🪙', value: 0.01, image: 'assets/bills/coin-penny.png' },
+    ];
+
+    let stockItems = loadStock();
+    let cartItems = [];
+    let paymentState = denominations.map(d => ({ ...d, count: 0, enabled: false }));
+    let checkUsed = false;
+
+    function loadStock() {
+      const raw = localStorage.getItem(storageKey);
+      if (!raw) return [];
+      try {
+        const saved = JSON.parse(raw);
+        if (!Array.isArray(saved)) return [];
+        return saved.map(item => ({
+          id: item.id,
+          name: item.name,
+          image: item.image,
+          quantity: Number(item.quantity) || 0,
+          price: Number(item.price) || 0,
+        }));
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveStock(items) {
+      localStorage.setItem(storageKey, JSON.stringify(items.map(item => ({
+        id: item.id,
+        name: item.name,
+        image: item.image,
+        quantity: item.quantity,
+        price: item.price,
+      }))));
+    }
+
+    function formatMoney(value) {
+      return value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+    }
+
+    function renderProducts() {
+      productGrid.innerHTML = '';
+      if (!stockItems.length) {
+        productGrid.innerHTML = '<div style="color: rgba(255,255,255,0.8);">No items in stock.</div>';
+        return;
+      }
+
+      stockItems.forEach(item => {
+        const card = document.createElement('div');
+        card.className = 'product-card';
+        card.innerHTML = `
+          <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image'" />
+          <div class="content">
+            <p class="name">${item.name}</p>
+            <p class="price">$${formatMoney(item.price)}</p>
+            <button data-action="add" data-id="${item.id}" ${item.quantity === 0 ? 'disabled' : ''}>${item.quantity === 0 ? 'Out of stock' : 'Add to cart'}</button>
+          </div>
+        `;
+        productGrid.appendChild(card);
+      });
+    }
+
+    function renderCart() {
+      cartElement.innerHTML = '';
+      if (!cartItems.length) {
+        cartElement.innerHTML = '<div style="color: rgba(255,255,255,0.8);">Cart is empty. Select items to start a purchase.</div>';
+        completeButton.disabled = true;
+        cartTotalElement.textContent = '$0.00';
+        return;
+      }
+
+      cartItems.forEach(item => {
+        const cartItem = document.createElement('div');
+        cartItem.className = 'cart-item';
+        cartItem.innerHTML = `
+          <div class="row">
+            <p class="name">${item.name}</p>
+            <p class="price">$${formatMoney(item.price)} each</p>
+          </div>
+          <div class="row">
+            <div class="quantity-controls">
+              <button data-action="decrement" data-id="${item.id}">-</button>
+              <input type="number" min="1" value="${item.quantity}" data-id="${item.id}" />
+              <button data-action="increment" data-id="${item.id}">+</button>
+            </div>
+            <button data-action="remove" data-id="${item.id}">Remove</button>
+          </div>
+          <div class="row">
+            <span>Subtotal:</span>
+            <span>$${formatMoney(item.quantity * item.price)}</span>
+          </div>
+        `;
+        cartElement.appendChild(cartItem);
+      });
+
+      cartTotalElement.textContent = `$${formatMoney(getCartTotal())}`;
+      completeButton.disabled = false;
+    }
+
+    function getCartTotal() {
+      return cartItems.reduce((sum, item) => sum + item.quantity * item.price, 0);
+    }
+
+    function addToCart(itemId) {
+      const item = stockItems.find(x => x.id === itemId);
+      if (!item || item.quantity === 0) return;
+      const cartItem = cartItems.find(x => x.id === itemId);
+      if (cartItem) {
+        cartItem.quantity += 1;
+      } else {
+        cartItems.push({ ...item, quantity: 1 });
+      }
+      renderCart();
+    }
+
+    function updateCartItemQuantity(itemId, quantity) {
+      const cartItem = cartItems.find(x => x.id === itemId);
+      if (!cartItem) return;
+      const validQuantity = Math.max(1, Math.floor(quantity));
+      cartItem.quantity = validQuantity;
+      renderCart();
+    }
+
+    function removeCartItem(itemId) {
+      cartItems = cartItems.filter(x => x.id !== itemId);
+      renderCart();
+    }
+
+    function buildDenominations() {
+      denominationsContainer.innerHTML = '';
+      paymentState.forEach((denom, index) => {
+        const row = document.createElement('div');
+        row.className = 'denomination';
+        row.innerHTML = `
+          <div class="bill-label">${denom.image ? `<img class="bill-icon bill-image" src="${denom.image}" alt="${denom.name} image" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<span class=\\\'bill-icon\\\'>💵</span>')" />` : `<span class="bill-icon">${denom.icon}</span>`}${denom.name}</div>
+          <div class="count-controls">
+            <button data-action="decrement" data-index="${index}">-</button>
+            <input type="number" min="0" value="${denom.count}" data-index="${index}" />
+            <button data-action="increment" data-index="${index}">+</button>
+          </div>
+          <div class="denom-value">$${formatMoney(denom.value)}</div>
+        `;
+        denominationsContainer.appendChild(row);
+      });
+
+      denominationsContainer.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', handleDenominationButton);
+      });
+      denominationsContainer.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('change', handleDenominationInput);
+      });
+    }
+
+    function handleDenominationButton(event) {
+      const action = event.currentTarget.dataset.action;
+      const index = Number(event.currentTarget.dataset.index);
+      const denom = paymentState[index];
+      if (!denom) return;
+      denom.count = Math.max(0, denom.count + (action === 'increment' ? 1 : -1));
+      renderPayment();
+      buildDenominations();
+    }
+
+    function handleDenominationInput(event) {
+      const index = Number(event.currentTarget.dataset.index);
+      const denom = paymentState[index];
+      if (!denom) return;
+      const value = Number(event.currentTarget.value);
+      denom.count = Number.isNaN(value) || value < 0 ? 0 : Math.floor(value);
+      renderPayment();
+    }
+
+    function handleDenominationToggle(event) {
+      // no longer used; kept for compatibility
+    }
+
+    function getPaymentTotal() {
+      return paymentState.reduce((sum, denom) => sum + denom.count * denom.value, 0);
+    }
+
+    function renderPayment() {
+      const owed = getCartTotal();
+      const paymentTotal = getPaymentTotal();
+      const change = paymentTotal - owed;
+      paymentTotalEl.textContent = formatMoney(paymentTotal);
+
+      if (checkUsed) {
+        changeDueEl.textContent = 'Still owed: $0.00';
+        changeDueEl.classList.remove('negative');
+      } else if (change >= 0) {
+        changeDueEl.textContent = `Change owed: $${formatMoney(change)}`;
+        changeDueEl.classList.remove('negative');
+      } else {
+        changeDueEl.textContent = `Still owed: $${formatMoney(Math.abs(change))}`;
+        changeDueEl.classList.add('negative');
+      }
+
+      showHintButton.style.display = !checkUsed && change > 0 ? 'inline-block' : 'none';
+      finishPaymentButton.disabled = !checkUsed && change < 0;
+      hintContainer.classList.remove('active');
+      hintContainer.textContent = '';
+    }
+
+    function calculateChangeSuggestion(amount) {
+      let remaining = Math.round(amount * 100);
+      const suggestion = [];
+      denominations.forEach(denom => {
+        const cents = Math.round(denom.value * 100);
+        const count = Math.floor(remaining / cents);
+        if (count > 0) {
+          suggestion.push({ count, icon: denom.icon, image: denom.image || null, name: denom.name, value: denom.value });
+          remaining -= count * cents;
+        }
+      });
+      return suggestion;
+    }
+
+    function openTransactionOverlay() {
+      if (!cartItems.length) return;
+      overlay.classList.add('active');
+      overlayTotal.textContent = formatMoney(getCartTotal());
+      paymentState = denominations.map(d => ({ ...d, count: 0 }));
+      checkUsed = false;
+      checkPaymentCheckbox.checked = false;
+      buildDenominations();
+      renderPayment();
+    }
+
+    function closeTransactionOverlay() {
+      overlay.classList.remove('active');
+    }
+
+    function completeTransaction() {
+      const owed = getCartTotal();
+      const paymentTotal = getPaymentTotal();
+      if (paymentTotal < owed && !checkUsed) {
+        alert('Customer has not provided enough money yet.');
+        return;
+      }
+
+      cartItems.forEach(cartItem => {
+        const stockItem = stockItems.find(x => x.id === cartItem.id);
+        if (stockItem) {
+          stockItem.quantity = Math.max(0, stockItem.quantity - cartItem.quantity);
+        }
+      });
+      saveStock(stockItems);
+      cartItems = [];
+      renderProducts();
+      renderCart();
+      closeTransactionOverlay();
+      alert(`Transaction complete! Total paid: $${formatMoney(owed)}.`);
+    }
+
+    productGrid.addEventListener('click', event => {
+      const button = event.target.closest('button[data-action="add"]');
+      if (!button) return;
+      addToCart(button.dataset.id);
+    });
+
+    cartElement.addEventListener('click', event => {
+      const target = event.target;
+      const action = target.dataset.action;
+      if (!action) return;
+      const id = target.dataset.id;
+      if (action === 'increment') {
+        const cartItem = cartItems.find(x => x.id === id);
+        updateCartItemQuantity(id, cartItem.quantity + 1);
+      } else if (action === 'decrement') {
+        const cartItem = cartItems.find(x => x.id === id);
+        updateCartItemQuantity(id, Math.max(1, cartItem.quantity - 1));
+      } else if (action === 'remove') {
+        removeCartItem(id);
+      }
+    });
+
+    cartElement.addEventListener('change', event => {
+      if (event.target.matches('input[type="number"][data-id]')) {
+        updateCartItemQuantity(event.target.dataset.id, Number(event.target.value));
+      }
+    });
+
+    completeButton.addEventListener('click', openTransactionOverlay);
+    closeOverlay.addEventListener('click', closeTransactionOverlay);
+    overlay.addEventListener('click', event => {
+      if (event.target === overlay) closeTransactionOverlay();
+    });
+    showHintButton.addEventListener('click', () => {
+      const owed = getCartTotal();
+      const paymentTotal = getPaymentTotal();
+      const change = paymentTotal - owed;
+      const suggestion = calculateChangeSuggestion(change);
+
+      if (change <= 0 || !suggestion.length) {
+        hintContainer.textContent = 'Exact amount or no change needed.';
+      } else {
+        hintContainer.innerHTML = `
+          <div><strong>Give back:</strong> $${formatMoney(change)}</div>
+          <div style="display:grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); gap: 10px; margin-top:12px;">
+            ${suggestion.map(item => `
+              <div style="background:#fff; color:#111; border-radius:14px; padding:12px; display:flex; flex-direction:column; align-items:center; gap:8px;">
+                ${item.image ? `<img src="${item.image}" class="hint-image" alt="${item.name}" onerror="this.style.display='none'; this.insertAdjacentHTML('afterend', '<div class=\\'hint-icon\\'>💵</div>')" />` : `<div class="hint-icon">${item.icon || '💵'}</div>`}
+                <div style="font-size:16px; font-weight:bold;">${item.count} x ${item.name}</div>
+                <div style="font-size:14px; color:#555;">$${formatMoney(item.value)}</div>
+              </div>
+            `).join('')}
+          </div>
+        `;
+      }
+      hintContainer.classList.add('active');
+    });
+
+    checkPaymentCheckbox.addEventListener('change', () => {
+      checkUsed = checkPaymentCheckbox.checked;
+      renderPayment();
+    });
+
+    finishPaymentButton.addEventListener('click', completeTransaction);
+
+    document.addEventListener('DOMContentLoaded', () => {
+      renderProducts();
+      renderCart();
+      renderPayment();
+    });
+  </script>
+</body>
+</html>

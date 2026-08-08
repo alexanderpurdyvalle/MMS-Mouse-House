@@ -1,0 +1,504 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stock Management</title>
+  <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #9f0f0f;
+      --bg-dark: #500202;
+      --surface: #ffffff;
+      --surface-muted: #faf7f5;
+      --border: rgba(0, 0, 0, 0.08);
+      --text: #1c1c1c;
+      --text-muted: #575757;
+      --accent: #a80000;
+      --accent-soft: rgba(168, 0, 0, 0.08);
+      --shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(168, 0, 0, 0.65);
+      outline-offset: 3px;
+    }
+
+    body {
+      font-family: var(--font-family, Inter, system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif);
+      background: linear-gradient(180deg, #9f0f0f 0%, #7a0707 45%, #500202 100%);
+      color: var(--text);
+      margin: 0;
+      padding: 32px;
+      min-height: 100vh;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+    }
+
+    .container {
+      width: min(100%, 1040px);
+      margin: 0 auto;
+      padding: 32px;
+      border-radius: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      color: var(--text);
+      text-align: left;
+    }
+
+    h1 {
+      font-size: 44px;
+      margin-bottom: 12px;
+      color: var(--text);
+      line-height: 1.08;
+    }
+
+    .subtitle {
+      color: var(--text-muted);
+      font-size: 21px;
+      line-height: 1.65;
+      margin-bottom: 28px;
+    }
+
+    .panel {
+      background: var(--surface-muted);
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 24px;
+      margin-bottom: 24px;
+      text-align: left;
+      color: var(--text);
+    }
+
+    .panel.hidden {
+      display: none;
+    }
+
+    .panel label {
+      display: block;
+      font-weight: bold;
+      margin-bottom: 8px;
+    }
+
+    .panel input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 16px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      margin-bottom: 16px;
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .panel input::placeholder {
+      color: var(--text-muted);
+    }
+
+    .panel button,
+    .card button {
+      background: #ffffff;
+      color: #8b0000;
+      border: 1px solid rgba(168, 0, 0, 0.12);
+      border-radius: 16px;
+      padding: 14px 20px;
+      font-size: 16px;
+      cursor: pointer;
+      font-weight: 700;
+      transition: transform 0.15s ease, opacity 0.15s ease, border-color 0.15s ease;
+    }
+
+    .panel button:hover,
+    .card button:hover {
+      transform: scale(1.02);
+      opacity: 0.95;
+    }
+
+    .cards {
+      display: grid;
+      grid-template-columns: repeat(2, minmax(0, 1fr));
+      gap: 20px;
+    }
+
+    .card {
+      background: #ffffff;
+      border: 1px solid var(--border);
+      border-radius: 20px;
+      padding: 18px;
+      text-align: left;
+      display: flex;
+      flex-direction: column;
+      gap: 16px;
+      color: var(--text);
+    }
+
+    .card img {
+      width: 100%;
+      border-radius: 16px;
+      object-fit: cover;
+      min-height: 180px;
+      background: #2a0000;
+    }
+
+    .card h2 {
+      margin: 0;
+      font-size: 26px;
+      line-height: 1.2;
+    }
+
+    .quantity-row {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      flex-wrap: wrap;
+    }
+
+    .quantity-row input {
+      width: 80px;
+      text-align: center;
+      background: #ffffff;
+      border: 1px solid var(--border);
+      color: var(--text);
+    }
+
+    .quantity-row button {
+      min-width: 42px;
+      padding: 10px 12px;
+      border-radius: 12px;
+    }
+
+    .card .remove,
+    .card .edit,
+    .card .save,
+    .card .cancel {
+      background: rgba(248, 248, 248, 0.9);
+      color: var(--text);
+      border: 1px solid var(--border);
+    }
+
+    .card .remove:hover,
+    .card .edit:hover,
+    .card .save:hover,
+    .card .cancel:hover {
+      opacity: 0.95;
+      transform: scale(1.02);
+    }
+
+    .card .remove:hover {
+      background: #ffdddd;
+      color: #8b0000;
+    }
+
+    .card .edit {
+      background: #ffffff;
+      color: #8b0000;
+    }
+
+    .card .item-actions {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 10px;
+      margin-top: 10px;
+    }
+
+    .card .edit-form {
+      display: grid;
+      gap: 12px;
+      margin-top: 16px;
+    }
+
+    .card .edit-form input {
+      width: 100%;
+      padding: 14px 16px;
+      border-radius: 14px;
+      border: 1px solid var(--border);
+      background: #ffffff;
+      color: var(--text);
+      box-sizing: border-box;
+      font-size: 16px;
+    }
+
+    .card .edit-form button {
+      min-width: 120px;
+    }
+
+    .top-actions {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      gap: 12px;
+      margin-bottom: 16px;
+    }
+
+    .top-actions button {
+      margin: 0;
+    }
+
+    .link-home {
+      color: var(--accent);
+      text-decoration: underline;
+      cursor: pointer;
+      border: none;
+      background: transparent;
+      font-size: 16px;
+      padding: 0;
+    }
+
+    @media (max-width: 760px) {
+      .cards {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <div class="top-actions">
+      <button class="link-home" onclick="location.href='index.html'">← Back to Home</button>
+      <button id="toggle-add-form">Add new item</button>
+    </div>
+
+    <h1>Stock Management</h1>
+    <div class="subtitle">Add items with image, name, and quantity, then update counts directly.</div>
+
+    <div class="panel hidden" id="add-item-panel">
+      <label for="new-item-name">Item name</label>
+      <input id="new-item-name" type="text" placeholder="Example: Red Pencil" />
+
+      <label for="new-item-image">Image URL</label>
+      <input id="new-item-image" type="url" placeholder="https://example.com/image.png" />
+
+        <label for="new-item-count">Starting quantity</label>
+      <input id="new-item-count" type="number" min="0" value="1" />
+
+      <label for="new-item-price">Price</label>
+      <input id="new-item-price" type="number" min="0" step="0.01" value="0.00" />
+
+      <button id="add-item-button">Add item to stock</button>
+    </div>
+
+    <div class="cards" id="stock-cards"></div>
+  </div>
+
+  <script>
+    const stockCards = document.getElementById('stock-cards');
+    const addItemButton = document.getElementById('add-item-button');
+    const nameInput = document.getElementById('new-item-name');
+    const imageInput = document.getElementById('new-item-image');
+    const countInput = document.getElementById('new-item-count');
+    const priceInput = document.getElementById('new-item-price');
+    const toggleAddFormButton = document.getElementById('toggle-add-form');
+    const addItemPanel = document.getElementById('add-item-panel');
+    const stockStorageKey = 'school-store-stock';
+
+    function generateId() {
+      return `item-${Date.now()}-${Math.random().toString(36).slice(2, 7)}`;
+    }
+
+    function loadStock() {
+      const raw = localStorage.getItem(stockStorageKey);
+      if (!raw) return [];
+      try {
+        const saved = JSON.parse(raw);
+        if (!Array.isArray(saved)) return [];
+        return saved.map(item => ({
+          id: item.id || generateId(),
+          name: item.name || '',
+          image: item.image || 'https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image',
+          quantity: Number(item.quantity) || 0,
+          price: Number(item.price) || 0,
+          editMode: false,
+        }));
+      } catch (error) {
+        return [];
+      }
+    }
+
+    function saveStock() {
+      localStorage.setItem(stockStorageKey, JSON.stringify(stockItems.map(item => ({
+        id: item.id,
+        name: item.name,
+        image: item.image,
+        quantity: item.quantity,
+        price: item.price,
+      }))));
+    }
+
+    let stockItems = loadStock();
+
+    function renderStock() {
+      stockCards.innerHTML = '';
+
+      if (!stockItems.length) {
+        stockCards.innerHTML = '<div style="color: rgba(255,255,255,0.8); font-size: 18px;">No stock yet. Add an item to start your inventory.</div>';
+        return;
+      }
+
+      stockItems.forEach((item, index) => {
+        const card = document.createElement('div');
+        card.className = 'card';
+
+        if (item.editMode) {
+          card.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image'" />
+            <div>
+              <h2>Editing ${item.name}</h2>
+              <div class="edit-form">
+                <input type="text" name="edit-name" value="${item.name}" placeholder="Item name" />
+                <input type="url" name="edit-image" value="${item.image}" placeholder="Image URL" />
+                <input type="number" name="edit-price" min="0" step="0.01" value="${item.price.toFixed(2)}" placeholder="Price" />
+                <div class="item-actions">
+                  <button type="button" class="save" data-action="save" data-index="${index}">Save</button>
+                  <button type="button" class="cancel" data-action="cancel" data-index="${index}">Cancel</button>
+                </div>
+              </div>
+            </div>
+          `;
+        } else {
+          card.innerHTML = `
+            <img src="${item.image}" alt="${item.name}" onerror="this.src='https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image'" />
+            <div>
+              <h2>${item.name}</h2>
+              <div style="font-size: 18px; margin-bottom: 10px;">Price: $${item.price.toFixed(2)}</div>
+              <div class="quantity-row">
+                <button type="button" data-action="decrement" data-index="${index}">-</button>
+                <input type="number" min="0" value="${item.quantity}" data-index="${index}" />
+                <button type="button" data-action="increment" data-index="${index}">+</button>
+              </div>
+              <div class="item-actions">
+                <button type="button" class="edit" data-action="edit" data-index="${index}">Edit</button>
+                <button type="button" class="remove" data-action="remove" data-index="${index}">Remove</button>
+              </div>
+            </div>
+          `;
+        }
+
+        stockCards.appendChild(card);
+      });
+
+      stockCards.querySelectorAll('button[data-action]').forEach(button => {
+        button.addEventListener('click', handleStockAction);
+      });
+
+      stockCards.querySelectorAll('input[type="number"]').forEach(input => {
+        input.addEventListener('change', handleQuantityChange);
+      });
+    }
+
+    function handleStockAction(event) {
+      const action = event.currentTarget.dataset.action;
+      const index = Number(event.currentTarget.dataset.index);
+      const item = stockItems[index];
+      if (!item) return;
+
+      if (action === 'increment') {
+        item.quantity += 1;
+        saveStock();
+      } else if (action === 'decrement') {
+        item.quantity = Math.max(0, item.quantity - 1);
+        saveStock();
+      } else if (action === 'remove') {
+        stockItems.splice(index, 1);
+        saveStock();
+      } else if (action === 'edit') {
+        item.editMode = true;
+      } else if (action === 'cancel') {
+        item.editMode = false;
+      } else if (action === 'save') {
+        const card = event.currentTarget.closest('.card');
+        const nameField = card.querySelector('input[name="edit-name"]');
+        const imageField = card.querySelector('input[name="edit-image"]');
+        const priceField = card.querySelector('input[name="edit-price"]');
+        const newName = nameField.value.trim();
+        const newImage = imageField.value.trim() || 'https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image';
+        const newPrice = Number(priceField.value);
+
+        if (!newName) {
+          alert('Item name cannot be empty.');
+          nameField.focus();
+          return;
+        }
+
+        if (Number.isNaN(newPrice) || newPrice < 0) {
+          alert('Price must be 0 or higher.');
+          priceField.focus();
+          return;
+        }
+
+        item.name = newName;
+        item.image = newImage;
+        item.price = newPrice;
+        item.editMode = false;
+        saveStock();
+      }
+
+      renderStock();
+    }
+
+    function handleQuantityChange(event) {
+      const index = Number(event.currentTarget.dataset.index);
+      const value = Number(event.currentTarget.value);
+      if (Number.isNaN(value) || value < 0) {
+        event.currentTarget.value = stockItems[index].quantity;
+        return;
+      }
+      stockItems[index].quantity = value;
+      saveStock();
+    }
+
+    toggleAddFormButton.addEventListener('click', () => {
+      const isHidden = addItemPanel.classList.toggle('hidden');
+      toggleAddFormButton.textContent = isHidden ? 'Add new item' : 'Close form';
+      if (!isHidden) {
+        nameInput.focus();
+      }
+    });
+
+    addItemButton.addEventListener('click', () => {
+      const name = nameInput.value.trim();
+      const image = imageInput.value.trim() || 'https://via.placeholder.com/400x250/8B0000/FFFFFF?text=No+Image';
+      const quantity = Number(countInput.value);
+      const price = Number(priceInput.value);
+
+      if (!name) {
+        alert('Please enter an item name.');
+        nameInput.focus();
+        return;
+      }
+
+      if (Number.isNaN(quantity) || quantity < 0) {
+        alert('Quantity must be 0 or higher.');
+        countInput.focus();
+        return;
+      }
+
+      if (Number.isNaN(price) || price < 0) {
+        alert('Price must be 0 or higher.');
+        priceInput.focus();
+        return;
+      }
+
+      stockItems.push({ id: generateId(), name, image, quantity, price, editMode: false });
+      saveStock();
+      nameInput.value = '';
+      imageInput.value = '';
+      countInput.value = '1';
+      priceInput.value = '0.00';
+      renderStock();
+    });
+
+    renderStock();
+  </script>
+</body>
+</html>

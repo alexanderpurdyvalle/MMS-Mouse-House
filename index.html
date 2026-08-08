@@ -4,97 +4,232 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-  <title>School Store</title>
+  <title>Mouse House</title>
 
   <style>
+    :root {
+      color-scheme: light;
+      font-family: "Inter", system-ui, -apple-system, BlinkMacSystemFont, "Segoe UI", sans-serif;
+      --bg: #f4f1ee;
+      --surface: #ffffff;
+      --surface-strong: #f4f1ee;
+      --border: rgba(0, 0, 0, 0.08);
+      --accent: #a80000;
+      --accent-strong: #ff6f6f;
+      --text: #1c1c1c;
+      --text-muted: #575757;
+      --button: #ffffff;
+      --button-text: #8b0000;
+      --shadow: 0 24px 64px rgba(0, 0, 0, 0.12);
+    }
+
+    * {
+      box-sizing: border-box;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    select:focus-visible,
+    textarea:focus-visible {
+      outline: 3px solid rgba(168, 0, 0, 0.65);
+      outline-offset: 3px;
+    }
+
     body {
-      font-family: Arial, sans-serif;
-      background-color: #f3f5f7;
       margin: 0;
-      padding: 30px;
-      text-align: center;
-      color: #222;
+      min-height: 100vh;
+      background: linear-gradient(180deg, #9f0f0f 0%, #7a0707 45%, #500202 100%);
+      color: var(--text);
+      padding: 32px;
+      display: flex;
+      justify-content: center;
+      align-items: center;
     }
 
-    h1 {
-      font-size: 42px;
-      margin-bottom: 10px;
+    .page {
+      width: min(100%, 1040px);
+      padding: 28px;
+      border-radius: 32px;
+      background: var(--surface);
+      border: 1px solid var(--border);
+      box-shadow: var(--shadow);
+      backdrop-filter: blur(16px);
     }
 
-    .subtitle {
-      font-size: 22px;
-      margin-bottom: 40px;
+    .top-banner {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: space-between;
+      align-items: center;
+      gap: 18px;
+      padding: 18px 22px;
+      margin-bottom: 20px;
+      border-radius: 24px;
+      background: linear-gradient(90deg, rgba(168, 0, 0, 0.12), rgba(255, 111, 111, 0.08));
+      border: 1px solid rgba(168, 0, 0, 0.18);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 12px;
+      font-weight: 700;
+      color: var(--accent);
+      font-size: 16px;
+    }
+
+    .badge span {
+      font-size: 24px;
+    }
+
+    .banner-text {
+      color: var(--text);
+      font-size: 15px;
+      line-height: 1.55;
+      max-width: 680px;
+    }
+
+    .top-banner {
+      display: grid;
+      grid-template-columns: auto 1fr;
+      gap: 20px;
+      align-items: center;
+      padding: 20px 24px;
+      margin-bottom: 24px;
+      border-radius: 24px;
+      background: linear-gradient(90deg, rgba(168, 0, 0, 0.13), rgba(255, 111, 111, 0.08));
+      border: 1px solid rgba(168, 0, 0, 0.18);
+    }
+
+    .badge {
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      width: 96px;
+      height: 96px;
+      border-radius: 24px;
+      background: rgba(255, 255, 255, 0.9);
+      font-size: 56px;
+      line-height: 1;
+    }
+
+    .banner-text h1 {
+      margin: 0 0 12px;
+      font-size: clamp(40px, 6vw, 56px);
+      color: var(--text);
+    }
+
+    .banner-text p {
+      margin: 0;
+      font-size: 17px;
+      color: var(--text-muted);
+      line-height: 1.8;
     }
 
     .menu {
       display: grid;
-      grid-template-columns: repeat(2, 1fr);
-      gap: 20px;
-      max-width: 700px;
-      margin: auto;
+      grid-template-columns: repeat(3, minmax(0, 1fr));
+      gap: 22px;
     }
 
     .menu-button {
-      background: white;
-      border: 4px solid #333;
-      border-radius: 20px;
-      padding: 35px 15px;
-      font-size: 28px;
-      font-weight: bold;
+      background: linear-gradient(180deg, rgba(255,255,255,0.16), rgba(255,255,255,0.08));
+      border: 1px solid rgba(255,255,255,0.22);
+      border-radius: 24px;
+      padding: 28px 24px;
+      font-size: 18px;
+      font-weight: 700;
       cursor: pointer;
-      min-height: 130px;
+      color: var(--text);
+      min-height: 180px;
+      display: grid;
+      grid-template-rows: auto 1fr auto;
+      gap: 16px;
+      text-align: left;
+      transition: transform 0.18s ease, background 0.18s ease, border-color 0.18s ease, box-shadow 0.18s ease;
     }
 
     .menu-button:hover {
-      background: #e8f4ff;
-      transform: scale(1.02);
+      transform: translateY(-4px);
+      background: rgba(255,255,255,0.18);
+      border-color: rgba(255,255,255,0.28);
+      box-shadow: 0 24px 38px rgba(0, 0, 0, 0.22);
     }
 
-    .icon {
+    .menu-button .icon {
+      font-size: 56px;
+      display: inline-flex;
+    }
+
+    .menu-button .label {
       display: block;
-      font-size: 50px;
-      margin-bottom: 10px;
+      font-size: 24px;
+      line-height: 1.05;
+      letter-spacing: -0.02em;
     }
 
-    @media (max-width: 600px) {
+    .menu-button .caption {
+      display: block;
+      color: var(--text-muted);
+      font-size: 15px;
+      line-height: 1.7;
+      max-width: 260px;
+    }
+
+    .menu-button + .menu-button {
+      border-left-width: 1px;
+    }
+
+    @media (max-width: 860px) {
       .menu {
         grid-template-columns: 1fr;
+      }
+
+      .brand {
+        width: 100%;
+        text-align: center;
+      }
+
+      .brand p {
+        max-width: 100%;
+      }
+
+      .subtitle-pill {
+        justify-content: center;
       }
     }
   </style>
 </head>
 
 <body>
+  <div class="page">
+    <div class="top-banner">
+      <div class="badge">🐭</div>
+      <div class="banner-text">
+        <h1>Mouse House</h1>
+        <p>Mouse House is open for business. Tap any of the main tasks to checkout, manage stock, or count money like a pro. Select one of the main actions below to keep the store running smoothly. What job are you doing today?</p>
+      </div>
+    </div>
 
-  <h1>🏪 School Store</h1>
+    <div class="menu">
+      <button class="menu-button" onclick="location.href='checkout.html'">
+        <span class="icon">🛒</span>
+        <span class="label">Checkout</span>
+        <span class="caption">Ring up orders and complete sales quickly.</span>
+      </button>
 
-  <div class="subtitle">
-    What job are you doing today?
+      <button class="menu-button" onclick="location.href='stock.html'">
+        <span class="icon">📦</span>
+        <span class="label">Stock</span>
+        <span class="caption">Manage inventory, update names, prices, and quantities.</span>
+      </button>
+
+      <button class="menu-button" onclick="location.href='count-money.html'">
+        <span class="icon">💰</span>
+        <span class="label">Count Money</span>
+        <span class="caption">Enter bills and coins to calculate the money box total.</span>
+      </button>
+    </div>
   </div>
-
-  <div class="menu">
-
-    <button class="menu-button">
-      <span class="icon">🛒</span>
-      CHECKOUT
-    </button>
-
-    <button class="menu-button">
-      <span class="icon">📦</span>
-      STOCK
-    </button>
-
-    <button class="menu-button">
-      <span class="icon">💰</span>
-      COUNT MONEY
-    </button>
-
-    <button class="menu-button">
-      <span class="icon">💬</span>
-      HELP A CUSTOMER
-    </button>
-
-  </div>
-
 </body>
 </html>
